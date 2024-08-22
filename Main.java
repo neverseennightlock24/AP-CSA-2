@@ -24,6 +24,6 @@ public class Main {
         HashMap<Integer, String> namePlaces = MapRoadBuilder.getIntersections(numPlaces, sc);
         Graph graph = MapRoadBuilder.getRoadGraph(numPlaces, namePlaces, sc);
 
-        MapRoadBuilder.resolveTravelTime(graph, sc);
+        MapRoadBuilder.resolveTravelDistance(graph, sc);
     }
 }

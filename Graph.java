@@ -11,17 +11,10 @@ public class Graph {
         edges = new HashMap<String, ArrayList<Road>>();
     }
 
-    public void addEdge(String fromNode, String toNode, String roadName, double length, double speedLimit, double traffic) {
+    public void addEdge(String fromNode, String toNode, double length) {
         nodes.add(fromNode);
         nodes.add(toNode);
-        Road road = new Road(toNode, roadName, length, speedLimit, traffic);
-        edges.computeIfAbsent(fromNode, k -> new ArrayList<Road>()).add(road);
-    }
-
-    public void addEdge(String fromNode, String toNode, String roadName, double length, double speedLimit) {
-        nodes.add(fromNode);
-        nodes.add(toNode);
-        Road road = new Road(toNode, roadName, length, speedLimit);
+        Road road = new Road(toNode, length);
         edges.computeIfAbsent(fromNode, k -> new ArrayList<Road>()).add(road);
     }
 
@@ -50,7 +43,7 @@ public class Graph {
             String current = pq.poll();
             ArrayList<Road> neighbours = edges.getOrDefault(current, new ArrayList<Road>());
             for (Road neighbour : neighbours) {
-                double newDist = distance.get(current) + neighbour.getLength() / Math.min(neighbour.getSpeedLimit(), neighbour.getTraffic());
+                double newDist = distance.get(current) + neighbour.getLength();
                 if (newDist < distance.get(neighbour.getToNode())) {
                     distance.put(neighbour.getToNode(), newDist);
                     prev.put(neighbour.getToNode(), current);

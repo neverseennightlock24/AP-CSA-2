@@ -34,7 +34,6 @@ public class MapRoadBuilder {
 
     public static Graph getRoadGraph(int numPlaces, HashMap<Integer, String> namePlaces, Scanner sc) {
         Graph graph = new Graph();
-        Set<String> roadNamesSet = new HashSet<>();
         int[][] map = new int[numPlaces][numPlaces];
 
         for (int i = 0; i < numPlaces; i++) {
@@ -60,19 +59,7 @@ public class MapRoadBuilder {
         for (int i = 0; i < numPlaces; i++) {
             for (int k = 0; k < numPlaces; k++) {
                 if (map[i][k] == 1) {
-                    String name = "";
-                    while (true) {
-                        System.out.println("Enter the name of the road between " + namePlaces.get(i) + " and " + namePlaces.get(k) + ":");
-                        name = sc.nextLine();
-                        if (roadNamesSet.contains(name)) {
-                            System.out.println("Road name already exists. Please enter a distinct name.");
-                        } else {
-                            roadNamesSet.add(name);
-                            break;
-                        }
-                    }
-
-                    System.out.println("Enter the length of the road in km: ");
+                    System.out.println("Enter the length of the road in km between " + namePlaces.get(i) + " and " + namePlaces.get(k) + ": ");
                     double length = 0;
                     while (true) {
                         try {
@@ -86,47 +73,14 @@ public class MapRoadBuilder {
                             System.out.println("Invalid input. Please enter a valid number.");
                         }
                     }
-                    System.out.println("Enter the speed limit of the road in km/h: ");
-                    double speedLimit = 0;
-                    while (true) {
-                        try {
-                            speedLimit = Double.parseDouble(sc.nextLine());
-                            if (speedLimit < 0) {
-                                System.out.println("Invalid input. Speed limit cannot be negative, resubmit a value.");
-                            } else {
-                                break;
-                            }
-                        } catch (NumberFormatException e) {
-                            System.out.println("Invalid input. Please enter a valid number.");
-                        }
-                    }
-
-                    System.out.println("Enter the level of traffic (heavy, medium, light), or enter the speed of traffic: ");
-                    String traffic = "";
-                    double trafficValue = 0;
-                    while (true) {
-                        traffic = sc.nextLine();
-                        if (traffic.equalsIgnoreCase("heavy")) {
-                            trafficValue = speedLimit / 5;
-                            break;
-                        } else if (traffic.equalsIgnoreCase("medium")) {
-                            trafficValue = speedLimit / 2;
-                            break;
-                        } else if (traffic.equalsIgnoreCase("light")) {
-                            trafficValue = speedLimit;
-                            break;
-                        } else {
-                            System.out.println("Invalid input. Make sure you exactly type the traffic level. Resubmit your input: ");
-                        }
-                    }
-                    graph.addEdge(namePlaces.get(i), namePlaces.get(k), name, length, speedLimit, trafficValue);
+                    graph.addEdge(namePlaces.get(i), namePlaces.get(k), length);
                 }
             }
         }
         return graph;
     }
 
-    public static void resolveTravelTime(Graph graph, Scanner sc) {
+    public static void resolveTravelDistance(Graph graph, Scanner sc) {
         Set<String> namesSet = new HashSet<>(graph.getNodes());
         String start = "";
         while (true) {
@@ -152,7 +106,7 @@ public class MapRoadBuilder {
             }
         }
 
-        int totalTime = 0;
+        double totalDistance = 0;
         ArrayList<String> path = new ArrayList<String>();
         path = graph.dijkstra(start, end);
         System.out.println("Take the following roads to your destination: ");
@@ -161,21 +115,16 @@ public class MapRoadBuilder {
             String nextNode = path.get(i + 1);
             ArrayList<Road> roads = graph.getRoad(currNode);
             for (Road road : roads) {
-                String prevName = "";
                 if (road.getToNode().equals(nextNode)) {
-                    if (!road.getRoadName().equals(prevName)) {
-                        System.out.println(road.getRoadName());
-                        prevName = road.getRoadName();
-                    }
-                    totalTime += (int) Math.round((road.getLength() / Math.min(road.getSpeedLimit(), road.getTraffic())) * 60.0);
+                    totalDistance += road.getLength();
                     break;
                 }
             }
         }
-        if (totalTime == 0) {
+        if (totalDistance == 0) {
             System.out.println("There is no valid route!");
         } else {
-            System.out.println("The fastest route from " + start + " to " + end + " will take " + totalTime + " minutes.");
+            System.out.println("The shortest route from " + start + " to " + end + " will cover a distance of " + totalDistance + " km.");
         }
     }
 }
